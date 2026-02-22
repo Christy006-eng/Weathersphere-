@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeatherSphere</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1 class="app-title">WeatherSphere</h1>
+        <button id="themeToggle" class="theme-toggle">Night Theme</button>
+    </header>
+
+    <section class="search-section">
+        <input type="text" id="searchInput" class="search-input" placeholder="Enter city name">
+        <button id="searchBtn" class="search-btn">Search</button>
+    </section>
+
+    <section class="location-buttons">
+        <button class="location-btn" data-location="Delhi">Delhi</button>
+        <button class="location-btn" data-location="Mumbai">Mumbai</button>
+        <button class="location-btn" data-location="Kolkata">Kolkata</button>
+        <button class="location-btn" data-location="Chennai">Chennai</button>
+    </section>
+
+    <section id="weatherContainer"></section>
+
+    <footer>
+  <p>
+    WeatherSphere © 2025 | Developed by 
+    <span class="developer-name">
+      <i class="fas fa-user"></i> Christy Lall
+    </span>
+  </p>
+    </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+          </html>
