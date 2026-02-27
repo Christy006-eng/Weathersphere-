@@ -262,4 +262,103 @@ body.dark-mode footer {
   0% { transform: translateY(-10px); }
   50% { transform: translateY(10px); }
   100% { transform: translateY(-10px); }
-  }
+  }.spa-nav{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+.spa-nav button{
+  padding:8px 15px;
+  border-radius:8px;
+  border:none;
+  background:linear-gradient(135deg,#4a90e2,#f39c12);
+  color:white;
+  cursor:pointer;
+}
+.spa-nav button:hover{
+  opacity:0.8;
+}/* ===== GOOGLE STYLE SWIPE ===== */
+/* ===== FIXED GOOGLE STYLE SWIPE ===== */
+.swipe-container{
+  width:100%;
+  overflow:hidden;
+  position:relative;
+}
+
+.swipe-slider{
+  display:flex;
+  width:100%;
+  transition:transform 0.4s ease;
+}
+
+.swipe-slide{
+  min-width:100%;
+  flex:0 0 100%;
+}
+/* Extra spacing under Today & Tomorrow */
+.extra-section{
+  margin-top:25px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.aqi-card, .remedy-card{
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding:18px;
+  text-align:center;
+  color:white;
+  box-shadow: var(--box-shadow);
+}
+.hourly-slider{
+  display:flex;
+  overflow-x:auto;
+  gap:10px;
+  padding:10px 0;
+}
+
+.hour-card{
+  min-width:80px;
+  background: var(--card-bg);
+  padding:10px;
+  border-radius:12px;
+  text-align:center;
+  color:white;
+  box-shadow: var(--box-shadow);
+}
+
+.hour-card p{
+  margin:4px 0;
+}
+/* 5-Day Forecast Cards */
+.five-day-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.five-day-container .day-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  text-align: center;
+  color: white;
+  flex: 1 1 30%;
+  box-shadow: var(--box-shadow);
+  min-width: 100px;
+}
+/* Light & Dark Mode */
+
+.aqi-card::after{
+  content:"";
+  display:block;
+  width:60%;
+  height:1px;
+  margin:20px auto 0;
+  background:rgba(255,255,255,0.4);
+}.aqi-card{
+  margin-bottom:25px;
+}
