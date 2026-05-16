@@ -9,6 +9,7 @@ const aiOutput = document.getElementById("aiOutput");
 
 let currentWeather = "";
 let currentTemp = 0;
+let currentSlideIndex = 0; // Track current slide
 
 /* QUICK CITY BUTTONS */
 document.querySelectorAll(".location-btn").forEach(btn => {
@@ -78,6 +79,7 @@ async function getWeatherByLocation(lat, lon) {
 async function renderWeather(current, forecast) {
     currentWeather = current.weather[0].main;
     currentTemp = current.main.temp;
+    currentSlideIndex = 0; // Reset slide index
 
     const icon = weatherIcons[currentWeather] || "🌡️";
     const lat = current.coord.lat;
@@ -128,42 +130,55 @@ async function renderWeather(current, forecast) {
         <p>${advice}</p>
     </div>
 
-    <div class="swipe-container">
-        <div class="swipe-slider" id="slider">
-            <div class="swipe-slide">
-                <h3>Hourly Forecast</h3>
-                <div class="hourly-cards">
-                    ${hourly.map(h => {
-                        const time = h.dt_txt.split(" ")[1].slice(0,5);
-                        const temp = h.main.temp.toFixed(1);
-                        const main = h.weather[0].main;
-                        return `<div class="hour-card"><p>${time}</p><p>${weatherIcons[main]}</p><p>${temp}°C</p></div>`;
-                    }).join("")}
+    <div class="swipe-wrapper">
+        <button class="slider-btn prev-btn" onclick="prevSlide()">❮</button>
+        
+        <div class="swipe-container">
+            <div class="swipe-slider" id="slider">
+                <div class="swipe-slide">
+                    <h3>Hourly Forecast</h3>
+                    <div class="hourly-cards">
+                        ${hourly.map(h => {
+                            const time = h.dt_txt.split(" ")[1].slice(0,5);
+                            const temp = h.main.temp.toFixed(1);
+                            const main = h.weather[0].main;
+                            return `<div class="hour-card"><p>${time}</p><p>${weatherIcons[main]}</p><p>${temp}°C</p></div>`;
+                        }).join("")}
+                    </div>
                 </div>
-            </div>
-            <div class="swipe-slide">
-                <h3>Tomorrow</h3>
-                <div class="tomorrow-box">
-                    ${daily[tomorrow].map(t => {
-                        const time = t.dt_txt.split(" ")[1].slice(0,5);
-                        const temp = t.main.temp.toFixed(1);
-                        const main = t.weather[0].main;
-                        return `<p>${time} ${weatherIcons[main]} ${temp}°C</p>`;
-                    }).join("")}
+                <div class="swipe-slide">
+                    <h3>Tomorrow</h3>
+                    <div class="tomorrow-box">
+                        ${daily[tomorrow].map(t => {
+                            const time = t.dt_txt.split(" ")[1].slice(0,5);
+                            const temp = t.main.temp.toFixed(1);
+                            const main = t.weather[0].main;
+                            return `<p>${time} ${weatherIcons[main]} ${temp}°C</p>`;
+                        }).join("")}
+                    </div>
                 </div>
-            </div>
-            <div class="swipe-slide">
-                <h3>5 Day Forecast</h3>
-                <div class="forecast-cards">
-                    ${fiveDays.map(day => {
-                        const avg = (daily[day].reduce((s,d)=>s+d.main.temp,0)/daily[day].length).toFixed(1);
-                        const main = daily[day][0].weather[0].main;
-                        const name = new Date(day).toLocaleDateString("en-US",{weekday:"short"});
-                        return `<div class="forecast-card"><p>${name}</p><p>${weatherIcons[main]}</p><p>${avg}°C</p></div>`;
-                    }).join("")}
+                <div class="swipe-slide">
+                    <h3>5 Day Forecast</h3>
+                    <div class="forecast-cards">
+                        ${fiveDays.map(day => {
+                            const avg = (daily[day].reduce((s,d)=>s+d.main.temp,0)/daily[day].length).toFixed(1);
+                            const main = daily[day][0].weather[0].main;
+                            const name = new Date(day).toLocaleDateString("en-US",{weekday:"short"});
+                            return `<div class="forecast-card"><p>${name}</p><p>${weatherIcons[main]}</p><p>${avg}°C</p></div>`;
+                        }).join("")}
+                    </div>
                 </div>
             </div>
         </div>
+
+        <button class="slider-btn next-btn" onclick="nextSlide()">❯</button>
+    </div>
+
+    <!-- DOT INDICATORS -->
+    <div class="slider-dots">
+        <span class="dot active" onclick="goToSlide(0)"></span>
+        <span class="dot" onclick="goToSlide(1)"></span>
+        <span class="dot" onclick="goToSlide(2)"></span>
     </div>
     `;
 
@@ -204,18 +219,76 @@ function runAnimation(type) {
     }
 }
 
-/* SWIPE SLIDER */
+/* SWIPE SLIDER - Touch + Mouse Support */
 function initSwipe(){
     const slider = document.getElementById("slider");
     if(!slider) return;
-    let startX=0, index=0;
-    slider.addEventListener("touchstart",e=>{ startX=e.touches[0].clientX; });
-    slider.addEventListener("touchend",e=>{
-        const diff = startX - e.changedTouches[0].clientX;
-        if(diff>50 && index<2) index++;
-        if(diff<-50 && index>0) index--;
-        slider.style.transform = `translateX(-${index*100}%)`;
+
+    let startX = 0;
+
+    // Touch events (Mobile)
+    slider.addEventListener("touchstart", e => { 
+        startX = e.touches[0].clientX; 
     });
+
+    slider.addEventListener("touchend", e => {
+        const diff = startX - e.changedTouches[0].clientX;
+        if(diff > 50 && currentSlideIndex < 2) {
+            currentSlideIndex++;
+        } else if(diff < -50 && currentSlideIndex > 0) {
+            currentSlideIndex--;
+        }
+        updateSlider();
+    });
+
+    // Mouse events (Desktop)
+    slider.addEventListener("mousedown", e => { 
+        startX = e.clientX; 
+    });
+
+    slider.addEventListener("mouseup", e => {
+        const diff = startX - e.clientX;
+        if(diff > 50 && currentSlideIndex < 2) {
+            currentSlideIndex++;
+        } else if(diff < -50 && currentSlideIndex > 0) {
+            currentSlideIndex--;
+        }
+        updateSlider();
+    });
+}
+
+/* Update slider position and dots */
+function updateSlider() {
+    const slider = document.getElementById("slider");
+    if(slider) {
+        slider.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+    }
+
+    // Update dots
+    document.querySelectorAll(".dot").forEach((dot, i) => {
+        dot.classList.toggle("active", i === currentSlideIndex);
+    });
+}
+
+/* Arrow button functions */
+function nextSlide() {
+    if(currentSlideIndex < 2) {
+        currentSlideIndex++;
+        updateSlider();
+    }
+}
+
+function prevSlide() {
+    if(currentSlideIndex > 0) {
+        currentSlideIndex--;
+        updateSlider();
+    }
+}
+
+/* Go to specific slide */
+function goToSlide(index) {
+    currentSlideIndex = index;
+    updateSlider();
 }
 
 /* SEARCH BUTTON */
@@ -234,7 +307,7 @@ themeToggle.addEventListener("click",()=>{
 
 /* AUTO LOCATION WITH DELHI DEFAULT */
 window.addEventListener("load",()=>{
-    getWeather("Delhi"); // Default
+    getWeather("Delhi");
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(
             pos => getWeatherByLocation(pos.coords.latitude, pos.coords.longitude),
@@ -274,4 +347,4 @@ function askAI(){
     }
 
     aiOutput.innerText = ans;
-}
+            }
